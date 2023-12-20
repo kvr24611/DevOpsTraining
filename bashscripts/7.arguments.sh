@@ -6,11 +6,11 @@ echo "The 0th place argument is $0"
 # Print the 1st place argument
 echo "The first place argument is $1"
 # List all the arguments passed
-echo "The aruments passed are $@"
+echo "The arguments passed are $@"
 # Count and print the number of arguments passed
-echo "The number of argument passed is $#"
+echo "The number of arguments passed is $#"
 # Print the second place argument
-echo "The 2nd place arguemtn is $2"
+echo "The 2nd place argument is $2"
 # Print the number of arguments passed."
 echo "The process id is $$"
 # Print the hostname of the system

@@ -12,7 +12,7 @@ echo "The number of argument passed is $#"
 # Print the second place argument
 echo "The 2nd place arguemtn is $2"
 # Print the number of arguments passed."
-echo "The number of arugment is $$"
+echo "The process id is $$"
 # Print the hostname of the system
 echo "The hostname of the machine is $HOSTNAME"
 # Print the name of the user currently logging in.
@@ -20,7 +20,7 @@ echo "The current user is $USER"
 # Print the line number of the script
 echo "The line number is $LINENO"
 # Sleep 5 seconds
-sleep 5s
+sleep 5
 # Print the time taken to run scripts till now.
 echo "The time taken by the process is $SECONDS"
 # Generate some random number

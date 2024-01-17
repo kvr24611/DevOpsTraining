@@ -2,9 +2,9 @@
 
 if [ -f ./image_vers ]; 
 then     
-  docker container stop weather_app
-  docker container rm weather_app
-  docker image rm node_image:$(cat ../image_vers)
+docker container stop weather_app
+docker container rm weather_app
+docker image rm node_image:$(cat ../image_vers)
 fi
 
 cd docker/docker-examples

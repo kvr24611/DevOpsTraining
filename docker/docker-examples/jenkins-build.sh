@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 imageName="node_image"
-containerName="weather_app"
+containerName="weather_app_container"
 jenkinsJobName="build-docker-image"
 
 docker container stop $containerName

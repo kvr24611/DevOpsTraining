@@ -10,3 +10,6 @@ docker image rm $imageName &> /dev/null
 
 cd docker/docker-examples
 docker image build -t $imageName:$BUILD_NUMBER .
+
+cd /var/lib/jenkins/workspace/$jenkinsJobName
+echo $BUILD_NUMBER > ../image_vers

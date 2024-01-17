@@ -7,9 +7,9 @@ jenkinsJobName="build-docker-image"
 
 
 
-docker container stop $(docker container ps | awk -F ' ' '{print $1}'| tail -n +2) &> /dev/null
-docker container rm $(docker container ps | awk -F ' ' '{print $1}'| tail -n +2) &> /dev/null
-docker image rm $(docker images | awk -F ' ' '{print $3}' | tail -n +2) &> /dev/null
+docker container stop $(docker container ps -a | awk -F ' ' '{print $1}'| tail -n +2) &> /dev/null
+docker container rm -f $(docker container ps -a | awk -F ' ' '{print $1}'| tail -n +2) &> /dev/null
+docker image rm -f $(docker images | awk -F ' ' '{print $3}' | tail -n +2) &> /dev/null
 
 cd docker/docker-examples
 docker image build -t $imageName:$BUILD_NUMBER .

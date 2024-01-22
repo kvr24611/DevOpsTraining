@@ -4,7 +4,7 @@ pipeline {
     stage("BuildApplication") {
       steps {
         echo "Building the project..."
-        sh 'mvn -f pom.xml clean package'
+        sh 'mvn -f jenkins/java-tomcat-sample/pom.xml clean package'
         archiveArtifacts artifacts: '**/*.war', followSymlinks: false
       }
     }

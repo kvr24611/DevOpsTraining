@@ -35,7 +35,7 @@ pipeline {
 
     stage("RunStagingContainer") {
       steps {
-        timeout(time:1, unit:'Minutes') {
+        timeout(time:1, unit:'MINUTES') {
           input message: 'Approve the staging deployment.'
         }
         echo "Deploying the project to Staging server..."

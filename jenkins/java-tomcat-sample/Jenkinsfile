@@ -5,14 +5,19 @@ pipeline {
       steps {
         echo "Building the project..."
         sh 'mvn -f jenkins/java-tomcat-sample/pom.xml clean package'
-        archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+      }
+      post {
+	success {
+	  echo "Copying the artifact..."
+          archiveArtifacts artifacts: '**/*.war', followSymlinks: false	
+	}
       }
     }
 
     stage("CreateTomcatImage") {
       steps {
-        echo "Testing the project...123"
-        copyArtifacts filter: '*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
+        echo "Building docker image"
+        copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
         sh '''
 	original_pwd=$(pwd -P)
 	cd .

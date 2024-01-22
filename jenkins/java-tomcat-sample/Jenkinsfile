@@ -8,7 +8,7 @@ pipeline {
       }
       post {
 	success {
-	  echo "Copying the artifact..."
+	  echo "Archiving the artifact..."
           archiveArtifacts artifacts: '**/*.war', followSymlinks: false	
 	}
       }
@@ -16,11 +16,11 @@ pipeline {
 
     stage("CreateTomcatImage") {
       steps {
-        echo "Building docker image"
         copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
+        echo "Building docker image"
         sh '''
 	original_pwd=$(pwd -P)
-	cd .
+	cd jenkins/java-tomcat-sample
 	docker image build -t localtomcat:$BUILD_NUMBER
 	cd $original_pwd
 	sh '''

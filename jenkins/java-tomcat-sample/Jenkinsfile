@@ -1,21 +1,49 @@
 pipeline {
   agent any
   stages {
-    stage("build") {
+    stage("BuildApplication") {
       steps {
         echo "Building the project..."
+        sh 'mvn -f <path_to_jenkinsfile clean package>'
+        archiveArtifacts artifacts: '**/*.war', followSymlinks: false
       }
     }
 
-    stage("test") {
+    stage("CreateTomcatImage") {
       steps {
         echo "Testing the project...123"
+        copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
+        sh '''
+			  original_pwd=$(pwd -P)
+			  cd <path_to_Dockerfile>
+			  docker image build -t localtomcat:$BUILD_NUMBER
+			  cd $original_pwd
+		    sh '''
       }
     }
 
-    stage("deploy") {
+    stage("RunQAContainer") {
       steps {
-        echo "Deploying the project..."
+        echo "Deploying the project to QA server..."
+        sh '''
+        docker container stop tomcat_container_local || true
+        docker container rm tomcat_container_local || true
+        docker container run -dit --name tomcat_container_qa -p 8084:8080 localtomcat:$BUILD_NUMBER
+        sh '''
+      }
+    }
+
+    stage("RunStagingContainer") {
+      steps {
+        timeout(time:1, unit:'Minutes') {
+          input message: 'Approve the staging deployment.'
+        }
+        echo "Deploying the project to Staging server..."
+        sh '''
+        docker container stop tomcat_container_local || true
+        docker container rm tomcat_container_local || true
+        docker container run -dit --name tomcat_container_staging -p 8085:8080 localtomcat:$BUILD_NUMBER
+        sh '''
       }
     }
   }

@@ -14,11 +14,11 @@ pipeline {
         echo "Testing the project...123"
         copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
         sh '''
-			  original_pwd=$(pwd -P)
-			  cd .
-			  docker image build -t localtomcat:$BUILD_NUMBER
-			  cd $original_pwd
-		    sh '''
+	original_pwd=$(pwd -P)
+	cd .
+	docker image build -t localtomcat:$BUILD_NUMBER
+	cd $original_pwd
+	sh '''
       }
     }
 

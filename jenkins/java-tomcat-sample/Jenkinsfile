@@ -12,7 +12,7 @@ pipeline {
     stage("CreateTomcatImage") {
       steps {
         echo "Testing the project...123"
-        copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
+        copyArtifacts filter: '*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
         sh '''
 	original_pwd=$(pwd -P)
 	cd .

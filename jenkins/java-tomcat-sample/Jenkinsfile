@@ -4,7 +4,7 @@ pipeline {
     stage("BuildApplication") {
       steps {
         echo "Building the project..."
-        sh 'mvn -f <path_to_jenkinsfile clean package>'
+        sh 'mvn -f . clean package'
         archiveArtifacts artifacts: '**/*.war', followSymlinks: false
       }
     }
@@ -15,7 +15,7 @@ pipeline {
         copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastSuccessful()
         sh '''
 			  original_pwd=$(pwd -P)
-			  cd <path_to_Dockerfile>
+			  cd .
 			  docker image build -t localtomcat:$BUILD_NUMBER
 			  cd $original_pwd
 		    sh '''

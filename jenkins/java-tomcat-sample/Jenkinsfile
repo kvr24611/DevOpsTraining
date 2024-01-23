@@ -1,54 +1,65 @@
 pipeline {
-  agent any
-  stages {  
-    stage('BuildApplication') {
-      steps {
-         sh 'mvn -f jenkins/java-tomcat-sample/pom.xml clean package'
-      }
-      post {
-        success {
-            echo "we are archiving the artifact"
-            archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+    agent {
+        label 'master-node'
+    }
+    stages {
+        stage('BuildApplication') {
+            steps {
+                sh 'mvn -f jenkins/java-tomcat-sample/pom.xml clean package'
+            }
+            post {
+                success {
+                    echo "we are archiving the artifact"
+                    archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+                }
+            }
         }
-      }
-     }
 
-    stage('CreateTomcatImage') {
-      steps {
-	copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'maven-project-pipeline', selector: lastWithArtifacts()
-        echo "Bulding docker image"
-        sh '''
-        original_pwd=$(pwd -P)
-        cd jenkins/java-tomcat-sample
-        docker build -t localtomcatimg:$BUILD_NUMBER .
-        cd $original_pwd
-        sh '''
-      }
-    }
-
-    stage('Deploy in QA instance'){
-      steps {
-	echo "We are deploying the app"
-    	sh '''
-    	docker container stop tomcatlocalinstance || true
-    	docker container rm tomcatlocalinstance  || true
-    	docker container run -itd --name tomcatlocalinstance -p 8084:8080 localtomcatimg:$BUILD_NUMBER
-    	sh '''
-      }
-    }
-
-    stage('Deploy in Stagging instance'){
-      steps {
-        timeout(time:5, unit:'MINUTES'){
-            input message: 'Approve the stagging deployment'
+        stage('CreateTomcatImage') {
+            agent {
+                label 'ubuntu-slave'
+            }
+            steps {
+                copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'maven-project-pipeline', selector: lastWithArtifacts()
+                echo "Bulding docker image"
+                sh '''
+                original_pwd=$(pwd -P)
+                cd jenkins/java-tomcat-sample
+                docker build -t localtomcatimg:$BUILD_NUMBER .
+                cd $original_pwd
+                sh '''
+            }
         }
-	echo "We are deploying the app in stagging env"
-   	sh '''
-	docker container stop tomcatstaginginstance || true
-	docker container rm tomcatstaginginstance || true
-	docker container run -itd --name tomcatstaginginstance -p 8085:8080 localtomcatimg:$BUILD_NUMBER
-	sh '''
-      }
+
+        stage('Deploy in QA instance') {
+            agent {
+                label 'ubuntu-slave'
+            }
+            steps {
+                echo "We are deploying the app"
+                sh '''
+                docker container stop tomcatlocalinstance || true
+                docker container rm tomcatlocalinstance  || true
+                docker container run -itd --name tomcatlocalinstance -p 8084:8080 localtomcatimg:$BUILD_NUMBER
+                sh '''
+            }
+        }
+
+        stage('Deploy in Stagging instance') {
+            agent {
+                label 'ubuntu-slave'
+            }
+            steps {
+                timeout(time:5, unit:'MINUTES') {
+                    input message: 'Approve the stagging deployment'
+                }
+                echo "We are deploying the app in stagging env"
+                sh '''
+                docker container stop tomcatstaginginstance || true
+                docker container rm tomcatstaginginstance || true
+                docker container run -itd --name tomcatstaginginstance -p 8085:8080 localtomcatimg:$BUILD_NUMBER
+                sh '''
+            }
+        }
     }
-  }
 }

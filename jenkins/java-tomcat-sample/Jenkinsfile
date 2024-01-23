@@ -14,7 +14,7 @@ pipeline {
      }
     stage('CreateTomcatImage') {
       steps {
-	copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.maven-project-pipeline, selector: lastSuccessful()
+	copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'maven-project-pipeline', selector: lastWithArtifacts()
         echo "Bulding docker image"
         sh '''
         original_pwd=$(pwd -P)

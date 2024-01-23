@@ -1,6 +1,6 @@
 pipeline {
   agent any
-  stages {
+  stages {  
     stage('BuildApplication') {
       steps {
          sh 'mvn -f jenkins/java-tomcat-sample/pom.xml clean package'
@@ -12,6 +12,7 @@ pipeline {
         }
       }
      }
+
     stage('CreateTomcatImage') {
       steps {
 	copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'maven-project-pipeline', selector: lastWithArtifacts()
@@ -24,28 +25,30 @@ pipeline {
         sh '''
       }
     }
+
     stage('Deploy in QA instance'){
       steps {
 	echo "We are deploying the app"
-    sh '''
-    docker container stop tomcatlocalinstance || true
-    docker container rm tomcatlocalinstance  || true
-    docker container run -itd --name tomcatlocalinstance -p 8084:8080 localtomcatimg:$BUILD_NUMBER
-    sh '''
-	}
-	}
+    	sh '''
+    	docker container stop tomcatlocalinstance || true
+    	docker container rm tomcatlocalinstance  || true
+    	docker container run -itd --name tomcatlocalinstance -p 8084:8080 localtomcatimg:$BUILD_NUMBER
+    	sh '''
+      }
+    }
+
     stage('Deploy in Stagging instance'){
       steps {
         timeout(time:5, unit:'MINUTES'){
             input message: 'Approve the stagging deployment'
         }
 	echo "We are deploying the app in stagging env"
-    sh '''
-    docker container stop tomcatstaginginstance || true
-    docker container rm tomcatstaginginstance || true
-    docker container run -itd --name tomcatstaginginstance -p 8085:8080 localtomcatimg:$BUILD_NUMBER
-    sh '''
-	}
-	}
-   }
+   	sh '''
+	docker container stop tomcatstaginginstance || true
+	docker container rm tomcatstaginginstance || true
+	docker container run -itd --name tomcatstaginginstance -p 8085:8080 localtomcatimg:$BUILD_NUMBER
+	sh '''
+      }
+    }
+  }
 }

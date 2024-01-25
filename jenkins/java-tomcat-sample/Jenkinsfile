@@ -25,6 +25,7 @@ pipeline {
                 sh '''
                 original_pwd=$(pwd -P)
                 cd jenkins/java-tomcat-sample
+                docker image rm -f $(docker images | awk -F ' ' '{print $3}' | tail -n +2) &> /dev/null
                 docker build -t localtomcatimg:$BUILD_NUMBER .
                 cd $original_pwd
                 sh '''

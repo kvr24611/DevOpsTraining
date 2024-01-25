@@ -20,7 +20,7 @@ pipeline {
                 label 'ubuntu-slave'
             }
             steps {
-                copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'maven-project-pipeline', selector: lastWithArtifacts()
+                copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: env.JOB_NAME, selector: lastWithArtifacts()
                 echo "Bulding docker image"
                 sh '''
                 original_pwd=$(pwd -P)

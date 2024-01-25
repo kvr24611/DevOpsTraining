@@ -12,6 +12,10 @@ pipeline {
                 sh '''
                 original_pwd=$(pwd -P)
                 cd docker/docker-examples
+                docker container stop nodestaginginstance || true
+                docker container rm nodestaginginstance || true
+                docker container stop nodelocalinstance || true
+                docker container rm nodelocalinstance  || true
                 docker image rm -f $(docker images | awk -F ' ' '{print $3}' | tail -n +2) &> /dev/null
                 docker build -t localnodeimg:$BUILD_NUMBER .
                 cd $original_pwd
@@ -26,8 +30,6 @@ pipeline {
             steps {
                 echo "We are deploying the app"
                 sh '''
-                docker container stop nodelocalinstance || true
-                docker container rm nodelocalinstance  || true
                 docker container run -itd --name nodelocalinstance -p 8083:3000 localnodeimg:$BUILD_NUMBER
                 sh '''
             }
@@ -43,8 +45,6 @@ pipeline {
                 }
                 echo "We are deploying the app in stagging env"
                 sh '''
-                docker container stop nodestaginginstance || true
-                docker container rm nodestaginginstance || true
                 docker container run -itd --name nodestaginginstance -p 8082:3000 localnodeimg:$BUILD_NUMBER
                 sh '''
             }
